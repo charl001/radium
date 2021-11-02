@@ -1,0 +1,63 @@
+vic@DESKTOP-FHSGMJ0 MINGW64 ~
+$ cd C:/Users/vic/Desktop
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop
+$ mkdir assignment
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop
+$ cd assignment
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop/assignment
+$ mkdir source
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop/assignment
+$ mkdir destination
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop/assignment
+$ cd source
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop/assignment/source
+$ touch file.txt
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop/assignment/source
+$ cat > file.txt
+"Here is my code. Check it.
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop/assignment/source
+$ cd ..
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop/assignment
+$ cp source/file.txt destination
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop/assignment
+$ cd destination
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop/assignment/destination
+$ rm file.txt
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop/assignment/destination
+$ cd ..
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop/assignment
+$ mv source/file.txt destination
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop/assignment
+$ cd destination
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop/assignment/destination
+$ cat > file.txt
+FunctionUp check1 FunctionUp check2 FunctionUp check3
+Add anything .
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop/assignment/destination
+$ findstr FunctionUp file.txt
+FunctionUp check1 FunctionUp check2 FunctionUp check3
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop/assignment/destination
+$ ^C
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop/assignment/destination
+$ ^C
+
+vic@DESKTOP-FHSGMJ0 MINGW64 ~/Desktop/assignment/destination
+$
