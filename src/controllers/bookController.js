@@ -6,8 +6,14 @@ const mongoose= require("mongoose")
 
 const createBook = async function (req, res) {
     const book= req.body
-    let savedBook= await BookModel.create(book)
-    res.send({msg: savedBook})
+    let authorId=req.body.author
+    let authorFromRequest=await AuthorModel.findById(authorId)
+    if(authorFromRequest)
+    {
+        let bookCreated= await BookModel.create(book)
+        res.send({data:bookCreated})
+    }
+    res.send({msg:"The author id provided is not valid"})
 }
 
 const getBooks = async function(req, res){
