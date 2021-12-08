@@ -30,6 +30,13 @@ const createCollege = async function (req, res) {
 
         const { name, fullName, logoLink } = requestBody;
 
+        const Shortname= await CollegeModel.findOne({name})
+        if(Shortname)
+        {
+            res.status(400).send({status:false,message:"College name is already registered."})
+        }
+        
+
         if (!isValid(name)) {
             res.status(400).send({ status: false, message: 'College name is required' })
             return
@@ -72,7 +79,11 @@ const getInternlist = async function (req, res) {
         }
         const collegeId = CollegeDetail._id
 
+     
+
         const interests = await InternModel.find({ collegeId: collegeId, isDeleted:false }).select({_id:1,name:1,email:1,mobile:1})
+        
+       
 
         const { name, fullName, logoLink} = CollegeDetail
 
