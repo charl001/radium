@@ -23,6 +23,11 @@ const createIntern = async function (req, res) {
         const requestBody = req.body
         const { name, email, mobile, collegeName } = requestBody
 
+        if (!isValidRequestBody(requestBody)) {
+            res.status(400).send({ status: false, message: 'Invalid request parameters.' })
+            return
+        }
+
         if (!collegeName) {
             res.status(400).send({ status: false, message: ' college Name is required' })
             return
@@ -36,15 +41,19 @@ const createIntern = async function (req, res) {
 
         const collegeId = getCollegeDetail._id
 
-        if (!isValidRequestBody(requestBody)) {
-            res.status(400).send({ status: false, message: 'Invalid request parameters.' })
-            return
-        }
+
 
         if (!isValid(name)) {
             res.status(400).send({ status: false, message: ' name is required' })
             return
         }
+
+        const EmailIdinUse= await InternModel.findOne({email})
+        if(EmailIdinUse)
+        {
+            res.status(400).send({status:false,message:"Email id is already registered."})
+        }
+        
 
         if (!isValid(email)) {
             res.status(400).send({ status: false, message: ' Email is required' })
@@ -55,6 +64,13 @@ const createIntern = async function (req, res) {
             res.status(400).send({ status: false, message: 'Email should be a valid email address' })
             return
         }
+
+        const MobileNoinUse= await InternModel.findOne({mobile})
+        if(MobileNoinUse)
+        {
+            res.status(400).send({status:false,message:"Mobile Number is already registered."})
+        }
+
         if (!isValid(mobile)) {
             res.status(400).send({ status: false, message: ' mobile is required' })
             return
