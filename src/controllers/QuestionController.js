@@ -15,30 +15,29 @@ const questionDoc = async (req, res) => {
             res.status(400).send({ status: false, message: 'Invalid request parameters' });
             return
         }
-        if (!validate.isValidObjectId(requestbody.askedBy)) {
+        if (!validate.isValidObjectId(requestbody.userId )) {
             res.status(400).send({ status: false, message: `Please enter correct UserId` })
             return
         }
 
-        let UserFound = await UserModel.findById(requestbody.askedBy)
+        let UserFound = await UserModel.findById(requestbody.userId )
         if (!UserFound) {
             res.status(400).send({ status: false, message: `No Userfound with given UserId` })
             return
         }
-        if (!(TokenDetail == requestbody.askedBy)) {
+        if (!(TokenDetail == requestbody.userId )) {
             return res.status(403).send({ status: false, message: "userId does not match with token" })
         }
 
 
      
-        let { description, tag, askedBy } = requestbody;
-
+        let { description, tag, userId } = requestbody;
         if (!validate.isValid(description)) {
             res.status(400).send({ status: false, message: `description is required` })
             return
         };
 
-        let data = { description, askedBy }
+        let data = { description, askedBy:userId  }
         if (tag) {
             if (Array.isArray(tag)) {
                 data['tag'] = [...tag]
@@ -60,7 +59,7 @@ const getQuestions = async (req, res) => {
         let querybody = req.query;
 
         const { tag, sort } = querybody;
-
+        
         if (validate.isValid(tag)) {
             const tagArr = tag.split(',')
             filterQuery['tag'] = { $all: tagArr }
@@ -83,6 +82,12 @@ const getQuestions = async (req, res) => {
             let answer = await AnswerModel.find({ questionId: data[i]._id }).select({ text: 1, answeredBy: 1})
             data[i].answers = answer
         }
+        console.log(data)
+        if(data.length==0)
+        {
+            return res.status(400).send({status:false,message:"No Question found"})
+        }
+                 
         return res.status(200).send({ status: true, Details: data });
     } catch (err) {
         return res.status(500).send({ status: false, message: err.message })

@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 const QuestionSchema = new mongoose.Schema({
 
     description: {type: String,required: true,trim:true},
-    tag: [{type:String}],
+    tag: [{type:String,lowercase:true}],
     askedBy:{type:mongoose.Types.ObjectId,refs:'UserDB',required:true},
     deletedAt: {type:Date},
     isDeleted:{type:Boolean,default:false},
