@@ -58,7 +58,7 @@ const getQuestions = async (req, res) => {
         let filterQuery = { isDeleted: false }
         let querybody = req.query;
 
-        const { tag, sort } = querybody;
+        let { tag, sort } = querybody;
         
         if (validate.isValid(tag)) {
             const tagArr = tag.split(',')
@@ -66,6 +66,11 @@ const getQuestions = async (req, res) => {
         }
 
         if (validate.isValid(sort)) {
+            sort=sort.toLowerCase();
+            if(!(["ascending","descending"].includes(sort)))
+            {
+              return res.status(400).send({message:"Please give either ascending or descending"})
+            }
             if (sort == "ascending") {
                 var data = await QuestionModel.find(filterQuery).lean().sort({ createdAt: 1 })
             }
@@ -80,9 +85,13 @@ const getQuestions = async (req, res) => {
 
         for (let i = 0; i < data.length; i++) {
             let answer = await AnswerModel.find({ questionId: data[i]._id }).select({ text: 1, answeredBy: 1})
+           if(answer.length==0)
+           {
+               continue;
+           }
             data[i].answers = answer
         }
-        console.log(data)
+     
         if(data.length==0)
         {
             return res.status(400).send({status:false,message:"No Question found"})

@@ -15,17 +15,17 @@ const createAnswer = async (req, res) => {
             return
         }
 
-        if (!(TokenDetail == requestbody.answeredBy)) {
+        if (!(TokenDetail == requestbody.userId )) {
             res.status(400).send({ status: false, message: "userId in url param and in token is not same" })
         }
 
-        let { answeredBy, text, questionId } = requestbody;
+        let { userId, text, questionId } = requestbody;
 
-        if (!validate.isValidObjectId(answeredBy)) {
-            return res.status(400).send({ status: false, message: `${answeredBy} is not a valid User id` })
+        if (!validate.isValidObjectId(userId )) {
+            return res.status(400).send({ status: false, message: `${userId } is not a valid User id` })
         }
 
-        const UserFound = await UserModel.findById({ _id: answeredBy })
+        const UserFound = await UserModel.findById({ _id: userId  })
         if (!UserFound) {
             return res.status(404).send({ status: false, message: `User Details not found with given userId` })
         }
@@ -43,7 +43,7 @@ const createAnswer = async (req, res) => {
             return res.status(404).send({ status: false, message: `Question Details not found with given questionid` })
         }
 
-        let data = { answeredBy, text, questionId };
+        let data = { answeredBy:userId , text, questionId };
         let createAns = await AnswerModel.create(data);
         return res.status(201).send({ status: true, data: createAns })
     } catch (err) {
@@ -53,7 +53,6 @@ const createAnswer = async (req, res) => {
 
 const getAnswer = async (req, res) => {
     let questionId = req.params.questionId;
-    let answerId = req.params.answerId;
 
     if (!validate.isValidObjectId(questionId)) {
         return res.status(400).send({ status: false, message: `${questionId} is not a valid question id` })
@@ -63,48 +62,45 @@ const getAnswer = async (req, res) => {
     if (!QuestionFound) {
         return res.status(404).send({ status: false, message: `Question Details not found with given questionId` })
     }
-    if (!validate.isValidObjectId(answerId)) {
-        return res.status(400).send({ status: false, message: `${answerId} is not a valid answer id` })
-    }
 
     const AnswerFound = await AnswerModel.find({ questionId: questionId })
     if (!AnswerFound) {
-        return res.status(404).send({ status: false, message: `Question Details not found with given questionId` })
+        return res.status(404).send({ status: false, message: `No Answer found for given question Id.` })
     }
     if (AnswerFound.isDeleted == true) {
-        return res.status(400).send({ status: false, message: "Answer no linger exists" })
+        return res.status(400).send({ status: false, message: "Answer no longer exists" })
     }
-    return res.status(200).send({ status: false, Detils: AnswerFound })
+    return res.status(200).send({ status: false, Details: AnswerFound })
 
 }
 
 const updateAnswer = async (req, res) => {
     try {
-
+        let answerId=req.params.answerId
         requestbody = req.body;
         let TokenDetail = req.user
 
-        if (!validate.isValidRequestBody(requestbody)) {
-            res.status(400).send({ status: false, message: 'Request Body is missing' });
-            return
-        }
-
-        if (!validate.isValidObjectId(requestbody.answerId)) {
+        if (!validate.isValidObjectId(answerId)) {
             return res.status(400).send({ status: false, message: `${answerId} is not a valid answer id` })
         }
 
-        const AnswerFound = await AnswerModel.findOne({ _id: requestbody.answerId })
+        const AnswerFound = await AnswerModel.findOne({ _id:answerId })
         if (!AnswerFound) {
-            return res.status(404).send({ status: false, message: `Question Details not found with given questionId` })
+            return res.status(404).send({ status: false, message: `  No answer found` })
         }
         if (AnswerFound.isDeleted == true) {
-            return res.status(400).send({ status: false, message: "Answer no linger exists" })
+            return res.status(400).send({ status: false, message: "Answer no longer exists" })
         }
 
         if (!(TokenDetail == AnswerFound.answeredBy)) {
             return res.status(400).send({ status: false, message: "You are trying to update other user answer" })
         }
-        const { answerId, text } = requestbody;
+        
+        if (!validate.isValidRequestBody(requestbody)) {
+            res.status(400).send({ status: false, message: 'Request Body is missing' });
+            return
+        }
+        const { text } = requestbody;
         if (!validate.isValid(text)) {
             return res.status(400).send({ status: false, message: "Please provide valid text" })
         }
@@ -118,18 +114,39 @@ const updateAnswer = async (req, res) => {
 
 const deleteAnswer = async (req, res) => {
     try {
+        let answerId=req.params.answerId;
         let requestbody = req.body;
         let TokenDetail = req.user;
+        if (!validate.isValidObjectId(answerId)) {
+            return res.status(400).send({ status: false, message: `${answerId} is not a valid answer id` })
+        }
+
+        const AnswerFound = await AnswerModel.findOne({ _id:answerId })
+        if (!AnswerFound) {
+            return res.status(404).send({ status: false, message: `  No answer found` })
+        }
+        if (AnswerFound.isDeleted == true) {
+            return res.status(400).send({ status: false, message: "Answer no longer exists" })
+        }
+
         if (!validate.isValidRequestBody(requestbody)) {
             res.status(400).send({ status: false, message: 'Please provide userId and questionId' });
             return
         }
-        let { userId, questionId } = requestbody
+        if (!validate.isValidObjectId(requestbody.userId)) {
+            return res.status(400).send({ status: false, message: `${requestbody.userId} is not a valid User id` })
+        }
 
-        if (!(TokenDetail == userId)) {
+        const UserFound = await UserModel.findOne({ _id:requestbody.userId })
+        if (!UserFound) {
+            return res.status(404).send({ status: false, message: ` No User found` })
+        }
+       
+        if (!(TokenDetail == requestbody.userId)) {
             return res.status(400).send({ status: false, message: "You are trying to delete other user answer" })
         }
-        await AnswerModel.findOneAndUpdate({ answeredBy: userId, questionId: questionId }, { $set: { isDeleted: true, deletedAt: new Date() } })
+        let { userId, questionId } = requestbody
+        await AnswerModel.findOneAndUpdate({ _id: answerId, questionId: questionId }, { $set: { isDeleted: true, deletedAt: new Date() } })
         return res.status(200).send({ status: true, message: `Answer deleted successfully` })
     } catch (err) {
         return res.status(500).send({ status: false, message: err.message })

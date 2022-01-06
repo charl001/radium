@@ -23,7 +23,7 @@ router.delete('/questions/:questionId',Middleware.Auth,QuestionController.delete
 
 
 router.post('/answer',Middleware.Auth,AnswerController.createAnswer)
-router.get('/questions/:questionId/answers/:answerId',AnswerController.getAnswer)
-router.put('/answer',Middleware.Auth,AnswerController.updateAnswer)
-router.delete('/answer',Middleware.Auth,AnswerController.deleteAnswer)
+router.get('/questions/:questionId/answer',AnswerController.getAnswer)
+router.put('/answer/:answerId',Middleware.Auth,AnswerController.updateAnswer)
+router.delete('/answers/:answerId',Middleware.Auth,AnswerController.deleteAnswer)
 module.exports = router;
