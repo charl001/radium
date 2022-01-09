@@ -29,7 +29,10 @@ const questionDoc = async (req, res) => {
             return res.status(403).send({ status: false, message: "userId does not match with token" })
         }
 
-
+       if((UserFound.creditScore<=0)||(UserFound.creditScore<100))
+       {
+           return res.status(400).send({status:false,message:`You dont have enough credit. Currently you have ${UserFound.creditScore} credit points.`})
+       }
      
         let { description, tag, userId } = requestbody;
         if (!validate.isValid(description)) {
@@ -46,7 +49,10 @@ const questionDoc = async (req, res) => {
                 data['tag'] = [tag]
             }
         }
+      
         const doc = await QuestionModel.create(data);
+        UserFound.creditScore=UserFound.creditScore-100;
+        await UserFound.save();
         return res.status(201).send({ status: true, data: doc })
     } catch (err) {
         return res.status(500).send({ status: false, message: err.message })
@@ -84,7 +90,7 @@ const getQuestions = async (req, res) => {
         }
 
         for (let i = 0; i < data.length; i++) {
-            let answer = await AnswerModel.find({ questionId: data[i]._id }).select({ text: 1, answeredBy: 1})
+            let answer = await AnswerModel.find({ questionId: data[i]._id }).sort({createdAt:-1}).select({ text: 1, answeredBy: 1})
            if(answer.length==0)
            {
                continue;
@@ -114,7 +120,7 @@ const getquestionId = async (req, res) => {
         if (!Question) {
             return res.status(404).send({ status: false, message: `Question does not exit` })
         }
-        let answer = await AnswerModel.find({ questionId: questionId }).select({ text: 1, answeredBy: 1 })
+        let answer = await AnswerModel.find({ questionId: questionId }).sort({createdAt:-1}).select({ text: 1, answeredBy: 1 })
         Question.answers=answer;
 
         return res.status(200).send({ status: true, message: 'Success', data: Question })

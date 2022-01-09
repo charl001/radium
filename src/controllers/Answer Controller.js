@@ -43,8 +43,15 @@ const createAnswer = async (req, res) => {
             return res.status(404).send({ status: false, message: `Question Details not found with given questionid` })
         }
 
+        if(QuestionFound.askedBy==userId)
+        {
+            return res.status(400).send({status:false,message:"You can not answer to your own question."})
+        }
+       
         let data = { answeredBy:userId , text, questionId };
         let createAns = await AnswerModel.create(data);
+        UserFound.creditScore=UserFound.creditScore+200;
+        await UserFound.save();
         return res.status(201).send({ status: true, data: createAns })
     } catch (err) {
         return res.status(500).send({ status: false, message: err.message })
@@ -63,7 +70,7 @@ const getAnswer = async (req, res) => {
         return res.status(404).send({ status: false, message: `Question Details not found with given questionId` })
     }
 
-    const AnswerFound = await AnswerModel.find({ questionId: questionId })
+    const AnswerFound = await AnswerModel.find({ questionId: questionId }).sort({createdAt:-1})
     if (!AnswerFound) {
         return res.status(404).send({ status: false, message: `No Answer found for given question Id.` })
     }
